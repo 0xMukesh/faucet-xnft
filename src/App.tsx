@@ -1,16 +1,15 @@
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import * as React from "react";
 import ReactXnft, { Button, Text, usePublicKey, View } from "react-xnft";
+import { Image } from "react-xnft";
 
-ReactXnft.events.on("connect", () => {
-  // no-op
-});
+ReactXnft.events.on("connect", () => {});
 
 export const App = () => {
   const publicKey = usePublicKey();
   const address = publicKey.toString();
   const [transactionLink, setTransactionLink] = React.useState<string | null>(
-    null
+    "abc"
   );
   const [balance, setBalance] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -56,23 +55,52 @@ export const App = () => {
         justifyContent: "center",
       }}
     >
+      <Image
+        src="https://res.cloudinary.com/didkcszrq/image/upload/v1665046864/logo_wprsm9.svg"
+        style={{
+          width: "100px",
+          height: "100px",
+          marginBottom: "20px",
+        }}
+      />
+      <Text
+        style={{
+          fontSize: "20px",
+          color: "white",
+        }}
+      >
+        SolFaucet
+      </Text>
+      <Text style={{ color: "#FFFFFF99", width: "80%", textAlign: "center" }}>
+        Get Solana Devnet funds right from your backpack wallet 🎒
+      </Text>
       <Button
         style={{
-          marginBottom: 20,
+          margin: "20px 0",
+          width: "200px",
+          backgroundColor: "#2AC9C9",
+          borderRadius: "32px",
+          color: "#000",
         }}
         disabled={transactionLink}
         onClick={() => requestAirDrop()}
       >
-        Request airdrop
+        Request Funds
       </Button>
       {balance && <Text>Balance: {balance} SOL</Text>}
       {transactionLink && (
-        <Text>
-          🎉 Funds sent successfully!{" "}
-          <Text as="a" href={transactionLink} target="_blank">
+        <>
+          <Text style={{ marginTop: "20px" }}>
+            🎉 Funds sent successfully!{" "}
+          </Text>
+          <Text
+            style={{ color: "#FFFFFF99", textDecoration: "underline" }}
+            href={transactionLink}
+            target="_blank"
+          >
             View transaction on Solana Explorer
           </Text>
-        </Text>
+        </>
       )}
       {error && (
         <Text
