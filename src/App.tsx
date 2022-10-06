@@ -1,8 +1,8 @@
-import * as React from 'react';
-import ReactXnft, { Button, Text, View, usePublicKey } from 'react-xnft';
-import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import * as React from "react";
+import ReactXnft, { Button, Text, usePublicKey, View } from "react-xnft";
 
-ReactXnft.events.on('connect', () => {
+ReactXnft.events.on("connect", () => {
   // no-op
 });
 
@@ -10,7 +10,7 @@ export const App = () => {
   const publicKey = usePublicKey();
   const address = publicKey.toString();
   const [transactionLink, setTransactionLink] = React.useState<string | null>(
-    ''
+    null
   );
   const [balance, setBalance] = React.useState<number | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -18,13 +18,15 @@ export const App = () => {
   const rpcUrl = window.xnft.solana.connection._rpcEndpoint;
   const connection = new Connection(rpcUrl);
   const wallet = new PublicKey(address);
+  console.log(connection);
 
   React.useEffect(() => {
     if (publicKey) {
-      (async () => {
+      const getBalance = async () => {
         const balance = await connection.getBalance(wallet);
         setBalance(balance / LAMPORTS_PER_SOL);
-      })();
+      };
+      getBalance();
     }
   }, [publicKey]);
 
@@ -35,19 +37,52 @@ export const App = () => {
         Number(LAMPORTS_PER_SOL)
       );
 
-      console.log('signature: ', signature);
       setTransactionLink(
         `https://explorer.solana.com/tx/${signature}?cluster=devnet`
       );
     } catch (e) {
+      console.error(e);
       setError(e.message);
-      console.log(e);
     }
   };
 
   return (
-    <View>
-      <Button onClick={() => requestAirDrop()}>request airdrop</Button>
+    <View
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Button
+        style={{
+          marginBottom: 20,
+        }}
+        disabled={transactionLink}
+        onClick={() => requestAirDrop()}
+      >
+        Request airdrop
+      </Button>
+      {balance && <Text>Balance: {balance} SOL</Text>}
+      {transactionLink && (
+        <Text>
+          🎉 Funds sent successfully!{" "}
+          <Text as="a" href={transactionLink} target="_blank">
+            View transaction on Solana Explorer
+          </Text>
+        </Text>
+      )}
+      {error && (
+        <Text
+          style={{
+            color: "red",
+          }}
+        >
+          {error}
+        </Text>
+      )}
     </View>
   );
 };
